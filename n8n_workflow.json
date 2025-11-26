@@ -1,0 +1,135 @@
+{
+  "name": "Twitter Support Bot",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "twitter-message",
+        "options": {}
+      },
+      "id": "webhook-node",
+      "name": "Webhook (Manual Trigger)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "twitter-support-bot"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/webhook/twitter",
+        "authentication": "none",
+        "requestMethod": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"username\": \"{{ $json.body.username }}\",\n  \"message\": \"{{ $json.body.message }}\",\n  \"is_dm\": {{ $json.body.is_dm || false }}\n}",
+        "options": {}
+      },
+      "id": "http-request-node",
+      "name": "Call Python Backend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition-1",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-node",
+      "name": "Success?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Return the bot's response\nreturn [\n  {\n    json: {\n      success: true,\n      intent: $input.first().json.intent,\n      response: $input.first().json.response,\n      ticket_number: $input.first().json.ticket_number,\n      escalated: $input.first().json.escalated,\n      message: `Bot responded with: ${$input.first().json.response}`\n    }\n  }\n];"
+      },
+      "id": "code-node",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 180]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Return error info\nreturn [\n  {\n    json: {\n      success: false,\n      error: 'Backend returned failure',\n      original_response: $input.first().json\n    }\n  }\n];"
+      },
+      "id": "error-node",
+      "name": "Handle Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 420]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook (Manual Trigger)": {
+      "main": [
+        [
+          {
+            "node": "Call Python Backend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Python Backend": {
+      "main": [
+        [
+          {
+            "node": "Success?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Success?": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Handle Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "meta": {
+    "instanceId": "twitter-support-bot"
+  },
+  "id": "twitter-support-bot",
+  "tags": []
+}
