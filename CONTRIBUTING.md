@@ -126,7 +126,7 @@ For questions or permissions:
 
 By contributing, you acknowledge that:
 1. Your contributions become part of the proprietary codebase
-2. Ownership remains with Jithin M
+2. Ownership remains with Jithin Mohandas (@DecentralizedJM)
 3. You have the right to submit the contribution
 4. You agree to the project's license terms
 
