@@ -4,7 +4,7 @@ Thank you for your interest in this project!
 
 ## 🔒 Proprietary Notice
 
-This is **proprietary software** owned by Jithin M (DecentralizedJM). All rights are reserved.
+This is **proprietary software** owned by Jithin Mohandas (@DecentralizedJM). All rights are reserved.
 
 ## ✅ What You Can Do
 
