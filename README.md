@@ -201,11 +201,11 @@ twitter-support-ai-intern/
 
 ## 📝 License
 
-**Copyright © 2025 Jithin M (DecentralizedJM)**
+**Copyright © 2025 @DecentralizedJM (DecentralizedJM)**
 
 **All Rights Reserved.**
 
-This project is proprietary software created by Jithin M.
+This project is proprietary software created by @DecentralizedJM.
 
 **Permitted:**
 ✅ Personal use and modification  
@@ -218,7 +218,7 @@ This project is proprietary software created by Jithin M.
 ❌ Creating competing products  
 ❌ Use without attribution  
 
-**Attribution Required:** If used publicly, credit must be given to Jithin M (DecentralizedJM).
+**Attribution Required:** If used publicly, credit must be given to @DecentralizedJM (DecentralizedJM).
 
 For commercial licensing or questions, please contact via GitHub.
 
@@ -237,7 +237,7 @@ See [LICENSE](LICENSE) file for complete terms.
 
 ## 📞 Contact
 
-- **Author:** Jithin M ([@DecentralizedJM](https://github.com/DecentralizedJM))
+- **Author:** @DecentralizedJM ([@DecentralizedJM](https://github.com/DecentralizedJM))
 - **Repository:** [AI-Intern-for-twitter-support](https://github.com/DecentralizedJM/AI-Intern-for-twitter-support)
 - **Issues:** [Report Here](https://github.com/DecentralizedJM/AI-Intern-for-twitter-support/issues)
 
@@ -262,4 +262,4 @@ Unlike typical AI chatbots that hallucinate and overpromise:
 
 ---
 
-Made with ❤️ by [Jithin M](https://github.com/DecentralizedJM)
+Made with ❤️ by [@DecentralizedJM](https://github.com/DecentralizedJM)
