@@ -8,6 +8,38 @@ Built to solve real-world support challenges for **Mudrex** (@MudrexHelp), but d
 
 ---
 
+## 🔐 Important: Mudrex-Specific Customization
+
+> **⚠️ This project is pre-configured for Mudrex** (@MudrexHelp)
+
+This bot's "brain" is hardwired with specific guardrails and limitations to ensure safe, reliable support:
+
+### 🧠 Built-in Guardrails:
+- ✅ **Email routing:** All responses direct users to `help@mudrex.com`
+- ✅ **No technical answers:** Bot CANNOT answer crypto/trading questions
+- ✅ **Template-based only:** Prevents AI hallucination
+- ✅ **Ticket format:** Expects #12345 (5-digit pattern)
+- ✅ **Security warnings:** Auto-detects and warns about credential sharing
+- ✅ **Empathy-first:** Pre-programmed empathetic responses
+
+### 🛡️ What the Bot CAN Do:
+- Route users to help@mudrex.com
+- Ask for ticket numbers in DMs
+- Escalate to Slack when tickets are shared
+- Provide FAQ links (support.mudrex.com)
+- Warn about security risks
+
+### 🚫 What the Bot CANNOT Do:
+- Answer technical questions about crypto/trading
+- Make promises about refunds or timelines
+- Access user accounts or balances
+- Provide financial advice
+- Deviate from pre-defined templates
+
+**To customize for your company:** Update `config.py` (email, templates) and `gemini_handler.py` (AI prompts)
+
+---
+
 ## 🎯 What This Does
 
 This AI intern doesn't pretend to solve problems it can't handle. Instead, it:
@@ -28,24 +60,136 @@ This AI intern doesn't pretend to solve problems it can't handle. Instead, it:
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Architecture & Workflow
 
-\`\`\`
-Twitter Mentions/DMs
-        ↓
-    n8n Workflow
-        ↓
-Python Backend (FastAPI)
-        ↓
-   ┌────┴────┐
-   ↓         ↓
-Gemini AI   SQLite
-(Optional)  (Tracking)
-   ↓
-Response + Escalation
-   ↓
-Slack Notification (if urgent)
-\`\`\`
+### Complete System Flow (n8n-Style)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     TWITTER PLATFORM                             │
+│  • User mentions @MudrexHelp                                     │
+│  • User sends DM                                                 │
+└────────────────────┬────────────────────────────────────────────┘
+                     │
+                     ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                  N8N WORKFLOW (Automation)                       │
+│  1. Twitter Trigger - Polls for new mentions/DMs every 60s      │
+│  2. Data Transform - Extracts tweet ID, text, user info         │
+│  3. HTTP Request - POST to FastAPI webhook                      │
+└────────────────────┬────────────────────────────────────────────┘
+                     │
+                     ↓
+┌─────────────────────────────────────────────────────────────────┐
+│              PYTHON BACKEND (FastAPI Server)                     │
+│  • Receives webhook POST request                                │
+│  • Extracts: tweet_text, user_id, username, tweet_id            │
+└────────────────────┬────────────────────────────────────────────┘
+                     │
+                     ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                  TWITTER HANDLER (Main Logic)                    │
+│  • Validates input                                               │
+│  • Checks conversation history (SQLite)                          │
+│  • Routes to appropriate processor                              │
+└──────────┬──────────────────────────────┬───────────────────────┘
+           │                              │
+           ↓                              ↓
+┌──────────────────────┐      ┌──────────────────────────────────┐
+│   GEMINI AI          │      │   KEYWORD FALLBACK               │
+│   (Optional)         │      │   (Backup System)                │
+│                      │      │                                  │
+│ • Analyzes intent    │      │ • Pattern matching:              │
+│ • Classifies into:   │      │   - "ticket" → has_ticket        │
+│   1. new_complaint   │      │   - "withdrawal|deposit"         │
+│   2. has_ticket      │      │      → new_complaint             │
+│   3. follow_up       │      │   - "password|email"             │
+│   4. general_question│      │      → credentials_warning       │
+│   5. credentials     │      │   - Default → general_question   │
+│   6. dm_ticket       │      │                                  │
+└──────────┬───────────┘      └──────────┬───────────────────────┘
+           │                              │
+           └──────────────┬───────────────┘
+                          │
+                          ↓
+┌─────────────────────────────────────────────────────────────────┐
+│               CONFIG.PY (Response Templates)                     │
+│  • Selects random template from intent category                 │
+│  • Templates include:                                            │
+│    - Empathetic acknowledgment                                  │
+│    - "Please email help@mudrex.com" (hardcoded)                 │
+│    - Specific instructions based on intent                       │
+│  • NO AI GENERATION - Template-based only (prevents             │
+│    hallucination)                                               │
+└────────────────────┬────────────────────────────────────────────┘
+                     │
+                     ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                  SPECIAL CASE DETECTION                          │
+│  • Ticket Pattern: Regex r'#(\d{5})' detects #12345             │
+│  • If ticket number found → ESCALATE                            │
+│  • Credentials: Detects "password", "private key" → WARN        │
+└────────────────────┬────────────────────────────────────────────┘
+                     │
+                     ↓
+        ┌────────────┴─────────────┐
+        │                          │
+        ↓                          ↓
+┌──────────────────┐    ┌──────────────────────────────────────┐
+│  STANDARD REPLY  │    │     ESCALATION PATH                   │
+│                  │    │                                       │
+│ • Save to SQLite │    │ 1. Extract ticket #12345              │
+│ • Return response│    │ 2. Call SLACK_HANDLER                 │
+│ • n8n posts      │    │ 3. Send Slack notification:           │
+│   to Twitter     │    │    - User: @username                  │
+└──────────────────┘    │    - Ticket: #12345                   │
+                        │    - Tweet: "..."                     │
+                        │    - Link to ticket                   │
+                        │ 4. Save escalation to SQLite          │
+                        │ 5. Reply: "Team notified!"            │
+                        └───────────────────────────────────────┘
+                                       │
+                                       ↓
+                        ┌──────────────────────────────────────┐
+                        │      SLACK (#twitter-escalations)    │
+                        │                                      │
+                        │  🚨 Urgent Ticket Escalation         │
+                        │  User: @johndoe                      │
+                        │  Ticket: #12345                      │
+                        │  Issue: "Withdrawal stuck..."        │
+                        │  Link: support.mudrex.com/ticket/... │
+                        │                                      │
+                        │  [Human agent responds]              │
+                        └──────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                    SQLITE DATABASE                               │
+│  • Stores conversation history                                  │
+│  • Tracks escalations                                           │
+│  • Prevents duplicate processing                                │
+│  • Schema: user_id, tweet_id, intent, response, timestamp       │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 🔄 Data Flow Summary:
+
+1. **Input:** Twitter mention/DM → n8n polls → Webhook POST
+2. **Processing:** Python backend → Intent classification (AI/keyword)
+3. **Response Selection:** Config templates (Mudrex-specific)
+4. **Special Handling:** Ticket detection → Slack escalation
+5. **Output:** Response posted to Twitter via n8n
+6. **Tracking:** All conversations logged to SQLite
+
+### ⚙️ Key Decision Points:
+
+| Input Type | Intent Detected | Action Taken |
+|-----------|----------------|--------------|
+| "Withdrawal stuck!" | new_complaint | → Email help@mudrex.com |
+| "I have ticket #12345" | has_ticket | → DM me the number |
+| DM: "#12345" | dm_ticket_received | → Escalate to Slack |
+| "When will it be fixed?" | follow_up | → Being reviewed |
+| "Here's my password: xyz" | credentials_warning | → ⚠️ Security warning |
+| "How does trading work?" | general_question | → FAQ link |
 
 ---
 
