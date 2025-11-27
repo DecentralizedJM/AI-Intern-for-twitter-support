@@ -3,6 +3,15 @@
 *.env
 !.env.example
 
+# Sensitive Files
+*.key
+*.pem
+*.secret
+*_secret*
+cookies.json
+*cookies.json
+twitter_cookies.json
+
 # Python
 __pycache__/
 *.py[cod]
@@ -19,6 +28,7 @@ env/
 *.sqlite
 *.sqlite3
 data/*.db
+data/
 
 # IDE
 .vscode/

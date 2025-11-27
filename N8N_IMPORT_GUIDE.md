@@ -77,7 +77,7 @@ The imported workflow has **5 nodes**:
 
 ### Step 1: Make Sure Python Server is Running
 ```bash
-cd /Users/jm/twitter-support-ai-intern
+cd /path/to/AI-Intern-for-twitter-support
 source .venv/bin/activate
 python webhook_server.py
 ```
@@ -191,7 +191,7 @@ After import, you can:
 ## 📁 Workflow File Location
 
 ```
-/Users/jm/twitter-support-ai-intern/n8n_workflow.json
+./n8n_workflow.json
 ```
 
 ---
@@ -215,7 +215,7 @@ After import, you can:
 n8n start
 
 # Start Python backend
-cd /Users/jm/twitter-support-ai-intern
+cd /path/to/AI-Intern-for-twitter-support
 source .venv/bin/activate
 python webhook_server.py
 

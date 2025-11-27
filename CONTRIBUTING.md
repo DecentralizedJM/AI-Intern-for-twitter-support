@@ -4,7 +4,7 @@ Thank you for your interest in this project!
 
 ## 🔒 Proprietary Notice
 
-This is **proprietary software** owned by Jithin Mohandas (@DecentralizedJM). All rights are reserved.
+This is **proprietary software** owned by @DecentralizedJM. All rights are reserved.
 
 ## ✅ What You Can Do
 
@@ -58,7 +58,7 @@ The following require explicit written permission from the author:
 
 ### Code Contributions
 
-**Note:** All code contributions will be owned by Jithin M upon acceptance.
+**Note:** All code contributions will be owned by @DecentralizedJM upon acceptance.
 
 1. **Fork** the repository
 2. **Create a branch**: `git checkout -b feature/your-feature`
